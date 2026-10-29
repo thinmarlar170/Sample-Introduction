@@ -1,0 +1,201 @@
+:root {
+  color-scheme: light;
+  --ink: #263248;
+  --muted: #59677c;
+  --accent: #bd4f70;
+  --paper: #fffdf9;
+  --tile: #fff1e8;
+  --page-start: #f8e6db;
+  --page-end: #e8e8f5;
+  --shadow: rgb(38 50 72 / 14%);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  min-height: 100vh;
+  margin: 0;
+  padding: 2rem 1rem;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(145deg, var(--page-start), var(--page-end));
+  color: var(--ink);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  line-height: 1.6;
+  transition: background-color 180ms ease, color 180ms ease;
+}
+
+.profile-card {
+  width: min(100%, 42rem);
+  overflow: hidden;
+  border: 1px solid rgb(38 50 72 / 8%);
+  border-radius: 1.5rem;
+  background: var(--paper);
+  box-shadow: 0 1.25rem 3.5rem var(--shadow);
+}
+
+.hero {
+  position: relative;
+  padding: 3rem 2rem 2rem;
+  background: linear-gradient(135deg, #ffe2cc, #f8d7e5 55%, #dedcf7);
+  text-align: center;
+}
+
+.theme-toggle {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  padding: 0.55rem 0.8rem;
+  border: 1px solid rgb(38 50 72 / 15%);
+  border-radius: 999px;
+  background: var(--paper);
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.theme-toggle:hover {
+  transform: translateY(-1px);
+}
+
+.theme-toggle:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 3px;
+}
+
+.avatar {
+  width: 5rem;
+  height: 5rem;
+  margin: 1.5rem auto 1rem;
+  display: grid;
+  place-items: center;
+  border: 3px solid var(--paper);
+  border-radius: 50%;
+  background: #fffaf3;
+  color: var(--accent);
+  font-size: 1.5rem;
+  font-weight: 800;
+}
+
+.eyebrow {
+  margin: 0 0 0.4rem;
+  color: var(--accent);
+  font-size: 0.8rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+h1 {
+  margin: 0;
+  font-size: clamp(2.2rem, 8vw, 3.5rem);
+  letter-spacing: -0.05em;
+  line-height: 1.1;
+}
+
+.location {
+  margin: 0.65rem 0 0;
+  color: var(--muted);
+}
+
+.content {
+  padding: 1.5rem;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.detail {
+  padding: 1rem 1.15rem;
+  border-radius: 1rem;
+  background: var(--tile);
+}
+
+.detail:first-child {
+  grid-column: 1 / -1;
+}
+
+.detail h2 {
+  margin: 0 0 0.4rem;
+  color: var(--accent);
+  font-size: 1rem;
+}
+
+.detail p {
+  margin: 0;
+}
+
+.hobbies {
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.35rem;
+  list-style: none;
+}
+
+footer {
+  padding: 0 1.5rem 1.5rem;
+  color: var(--muted);
+  text-align: center;
+}
+
+/* Dark theme colors are applied when the toggle sets data-theme. */
+body[data-theme="dark"] {
+  color-scheme: dark;
+  --ink: #f4efff;
+  --muted: #c3bfd2;
+  --accent: #ff9fba;
+  --paper: #242337;
+  --tile: #302e46;
+  --page-start: #191827;
+  --page-end: #29233b;
+  --shadow: rgb(0 0 0 / 30%);
+}
+
+body[data-theme="dark"] .hero {
+  background: linear-gradient(135deg, #47334b, #393652 55%, #303d55);
+}
+
+body[data-theme="dark"] .avatar {
+  background: #302e46;
+}
+
+@media (max-width: 32rem) {
+  body {
+    padding: 1rem;
+  }
+
+  .profile-card {
+    border-radius: 1rem;
+  }
+
+  .hero {
+    padding: 3.5rem 1.25rem 1.5rem;
+  }
+
+  .content {
+    padding: 1rem;
+    grid-template-columns: 1fr;
+  }
+
+  .detail:first-child {
+    grid-column: auto;
+  }
+
+  .theme-toggle {
+    top: 0.75rem;
+    right: 0.75rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}
