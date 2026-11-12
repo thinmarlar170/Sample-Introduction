@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Leave a message for Mar Lar.">
+  <title>Message Board | Mar Lar</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #20342c;
+      --muted: #52635a;
+      --paper: #fbf8ef;
+      --green: #376b52;
+      --coral: #c65e43;
+      --yellow: #f0c66c;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      min-height: 100vh;
+      margin: 0;
+      background-color: var(--paper);
+      background-image: radial-gradient(#d9dfcf 0.8px, transparent 0.8px);
+      background-size: 19px 19px;
+      color: var(--ink);
+      font-family: Georgia, "Times New Roman", serif;
+    }
+
+    main {
+      width: min(100% - 2rem, 760px);
+      margin: 0 auto;
+      padding: clamp(2rem, 8vw, 5rem) 0;
+    }
+
+    .board {
+      padding: clamp(1.5rem, 6vw, 3.5rem);
+      border-left: 6px solid var(--green);
+      background: rgba(255, 255, 255, 0.88);
+    }
+
+    .eyebrow {
+      margin: 0 0 0.8rem;
+      color: var(--coral);
+      font-family: Arial, sans-serif;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(2.4rem, 9vw, 4rem);
+      font-weight: 500;
+    }
+
+    h2 {
+      margin: 0 0 0.8rem;
+      color: var(--green);
+      font-family: Arial, sans-serif;
+      font-size: 0.9rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .message-list {
+      display: grid;
+      gap: 1rem;
+      margin: 2rem 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .message {
+      padding: 1rem;
+      border-top: 2px solid var(--yellow);
+      background: #fffefa;
+    }
+
+    .message p {
+      margin: 0;
+      line-height: 1.6;
+      overflow-wrap: anywhere;
+      white-space: pre-wrap;
+    }
+
+    .message-author {
+      margin-bottom: 0.4rem !important;
+      color: var(--green);
+      font-family: Arial, sans-serif;
+      font-size: 0.9rem;
+      font-weight: 700;
+    }
+
+    .message-form {
+      padding-top: 1.5rem;
+      border-top: 2px solid var(--yellow);
+    }
+
+    .field {
+      display: grid;
+      gap: 0.4rem;
+      margin-top: 1rem;
+      color: var(--muted);
+      font-family: Arial, sans-serif;
+      font-size: 0.9rem;
+      font-weight: 700;
+    }
+
+    input,
+    textarea {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid #aeb8a9;
+      border-radius: 2px;
+      background: #fffefa;
+      color: var(--ink);
+      font: 1rem Georgia, "Times New Roman", serif;
+    }
+
+    textarea {
+      min-height: 8rem;
+      resize: vertical;
+    }
+
+    .submit-button {
+      margin-top: 1rem;
+      padding: 0.75rem 1rem;
+      border: 0;
+      border-radius: 2px;
+      background: var(--green);
+      color: white;
+      cursor: pointer;
+      font: 700 0.95rem Arial, sans-serif;
+    }
+
+    .submit-button:disabled {
+      cursor: wait;
+      opacity: 0.7;
+    }
+
+    .form-status {
+      min-height: 1.5em;
+      margin: 0.75rem 0 0;
+      color: var(--muted);
+      font-family: Arial, sans-serif;
+    }
+
+    .form-status[data-state="error"] {
+      color: #a23d2b;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <section class="board" aria-labelledby="page-title">
+      <p class="eyebrow">Mar Lar's message board</p>
+      <h1 id="page-title">Leave a message</h1>
+
+      <section aria-labelledby="messages-title">
+        <h2 id="messages-title">Messages</h2>
+        <ol class="message-list" id="message-list" aria-live="polite"></ol>
+      </section>
+
+      <form class="message-form" id="message-form">
+        <h2>Write a message</h2>
+        <label class="field" for="sender-name">
+          Your name
+          <input id="sender-name" name="name" type="text" maxlength="100" autocomplete="name" required>
+        </label>
+        <label class="field" for="message-text">
+          Message
+          <textarea id="message-text" name="message" maxlength="5000" required></textarea>
+        </label>
+        <button class="submit-button" type="submit">Send message</button>
+        <p class="form-status" id="form-status" role="status" aria-live="polite"></p>
+      </form>
+    </section>
+  </main>
+  <script>
+    const form = document.querySelector("#message-form");
+    const status = document.querySelector("#form-status");
+    const messageList = document.querySelector("#message-list");
+    const submitButton = form.querySelector("button[type='submit']");
+
+    function displayMessage(message) {
+      const item = document.createElement("li");
+      item.className = "message";
+
+      const author = document.createElement("p");
+      author.className = "message-author";
+      author.textContent = message.name;
+
+      const text = document.createElement("p");
+      text.textContent = message.message;
+
+      item.append(author, text);
+      messageList.append(item);
+    }
+
+    async function loadMessages() {
+      const response = await fetch("/messages");
+      const messages = await response.json();
+      if (!response.ok) {
+        throw new Error(messages.error || "Messages could not be loaded.");
+      }
+      messages.forEach(displayMessage);
+    }
+
+    const messagesLoaded = loadMessages();
+    messagesLoaded.catch((error) => {
+      status.dataset.state = "error";
+      status.textContent = error.message || "Unable to load messages. Please refresh the page.";
+    });
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      status.textContent = "Sending...";
+      status.dataset.state = "";
+      submitButton.disabled = true;
+
+      try {
+        await messagesLoaded;
+        const response = await fetch("/messages", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(Object.fromEntries(new FormData(form)))
+        });
+        const result = await response.json();
+
+        if (!response.ok) {
+          throw new Error(result.error || "The message could not be sent.");
+        }
+
+        displayMessage(result.message);
+        form.reset();
+        status.textContent = "Message sent. Thank you!";
+      } catch (error) {
+        status.dataset.state = "error";
+        status.textContent = error.message || "Unable to reach the server. Please try again.";
+      } finally {
+        submitButton.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>
